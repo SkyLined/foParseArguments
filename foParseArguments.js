@@ -2,24 +2,25 @@ var oPath = require("path");
 function fShowHelp(oSettings) {
   asUsage = [oPath.basename(process.argv[1])];
   if (oSettings.adxParameters) {
-    for (var u = 0; u < oSettings.adxParameters.length; u++) {
-      var oParameterSettings = oSettings.adxParameters[u],
-          sParameterName = oParameterSettings.sName,
-          auParameterRepeat = oParameterSettings.auRepeat;
+    oSettings.adxParameters.forEach(function(oParameterSettings) {
       if (!oParameterSettings.auRepeat) {
-        asUsage.push(sParameterName);
+        asUsage.push(oParameterSettings.sName);
       } else {
+        asClosers = [];
         for (var uRepeat = 0; uRepeat < oParameterSettings.auRepeat[1]; uRepeat++) {
           if (uRepeat < oParameterSettings.auRepeat[0]) {
-            asUsage.push(sParameterName);
-          } else if (oParameterSettings.auRepeat[1] == Infinity) {
+            asUsage.push(oParameterSettings.sName);
+          } else if (uRepeat > 1 && oParameterSettings.auRepeat[1] == Infinity) {
             asUsage.push("[...]");
+            break;
           } else {
-            asUsage.push("[" + sParameterName + "]");
+            asUsage.push("[" + oParameterSettings.sName);
+            asClosers.push("]");
           }
         }
+        asUsage = asUsage.concat(asClosers);
       }
-    }
+    });
   }
   if (oSettings.dxOptions) {
     if (oSettings.dxSwitches) {
@@ -35,14 +36,13 @@ function fShowHelp(oSettings) {
   console.log("");
   if (oSettings.adxParameters) {
     console.log("Parameters:");
-    for (var u = 0; u < oSettings.adxParameters.length; u++) {
-      var oParameterSettings = oSettings.adxParameters[u];
-      console.log("    " + sParameterName + " (" + oParameterSettings.sTypeDescription + ")");
+    oSettings.adxParameters.forEach(function (oParameterSettings) {
+      console.log("    " + oParameterSettings.sName + " (" + oParameterSettings.sTypeDescription + ")");
       console.log("        " + oParameterSettings.sHelpText);
       if (oParameterSettings.xDefaultValue !== undefined) {
         console.log("        default: " + JSON.stringify(oParameterSettings.xDefaultValue));
       }
-    }
+    });
   }
   if (oSettings.dxOptions) {
     console.log("Options:");
@@ -187,8 +187,7 @@ function foParseArguments(oSettings, asArguments) {
       aauParameterRepeats = [],
       dxParameters = {};
   if (oSettings.adxParameters) {
-    for (var u = 0; u < oSettings.adxParameters.length; u++) {
-      var oParameterSettings = oSettings.adxParameters[u];
+    oSettings.adxParameters.forEach(function (oParameterSettings) {
       if (oParameterSettings.sName in dxParameters) {
         throw new Error("Parameter name \"" + oParameterSettings.sName + "\" is used more than once");
       }
@@ -196,16 +195,15 @@ function foParseArguments(oSettings, asArguments) {
       asParameterTypeDescriptions.push(oParameterSettings.sTypeDescription);
       aauParameterRepeats.push(oParameterSettings.auRepeat);
       dxParameters[oParameterSettings.sName] = undefined;
-    }
+    });
   }
   var bNoMoreOptionsOrSwitches = false,
       uParameterIndex = 0,
       uParameterRepeat = 0;
-  for (var u = 2; u < process.argv.length; u++) {
-    var sArgument = process.argv[u];
+  if (!asArguments.every(function (sArgument) {
     if (sArgument == "--") {
       bNoMoreOptionsOrSwitches = true;
-      continue;
+      return true;
     }
     var oOptionOrSwitchMatch = (
         bNoMoreOptionsOrSwitches ? false :
@@ -268,7 +266,10 @@ function foParseArguments(oSettings, asArguments) {
     } else {
       return fShowError("superfluous argument " + sArgument);
     }
-  }
+    return true;
+  })) {
+    return;
+  };
   while (uParameterIndex < asParameterNames.length) {
     if (!aauParameterRepeats[uParameterIndex]) {
       return fShowError("Missing parameter " + asParameterNames[uParameterIndex]);
