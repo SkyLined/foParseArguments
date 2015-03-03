@@ -117,7 +117,7 @@ function fxParseValueUsingTypeDescription(sName, sValue, sTypeDescription, dfxTy
 function foParseArguments(oSettings, asArguments) {
   var asArguments = asArguments || process.argv.slice(2);
   var dfxTypeConverters = {
-    "string": function (sName, sValue) {
+    "string": function (sValue) {
       return sValue;
     },
     "bool": function (sValue) {
@@ -240,16 +240,16 @@ function foParseArguments(oSettings, asArguments) {
       } else {
         return fShowError("Unknown options \"" + sName + "\"");
       }
-    } else {
+    } else if (uParameterIndex < asParameterNames.length) {
       var sParameterName = asParameterNames[uParameterIndex],
           sParameterTypeDescription = asParameterTypeDescriptions[uParameterIndex],
-          asParameterRepeats = aasParameterRepeats[uParameterIndex];
-      if (asParameterRepeats) {
-        if (++uParameterRepeat == asParameterRepeats[1]) {
+          auParameterRepeats = aauParameterRepeats[uParameterIndex];
+      if (auParameterRepeats) {
+        var sValueName = "parameter " + sParameterName + ", value #" + ++uParameterRepeat;
+        if (uParameterRepeat == auParameterRepeats[1]) {
           uParameterIndex++;
           uParameterRepeat = 0;
         }
-        var sValueName = "parameter " + sParameterName + ", value #" + uParameterRepeat;
         var xValue = fxParseValueUsingTypeDescription(
             sValueName, sArgument, sParameterTypeDescription, dfxTypeConverters);
         if (dxParameters[sParameterName] === undefined) {
@@ -265,13 +265,14 @@ function foParseArguments(oSettings, asArguments) {
         uParameterIndex++;
         uParameterRepeat = 0;
       }
-      axParameters.push(xParameterValue);
+    } else {
+      return fShowError("superfluous argument " + sArgument);
     }
   }
   while (uParameterIndex < asParameterNames.length) {
-    if (!aasParameterRepeats[uParameterIndex] || uParameterRepeat == 0) {
+    if (!aauParameterRepeats[uParameterIndex]) {
       return fShowError("Missing parameter " + asParameterNames[uParameterIndex]);
-    } else if (uParameterRepeat < aasParameterRepeats[uParameterIndex][0]) {
+    } else if (uParameterRepeat < aauParameterRepeats[uParameterIndex][0]) {
       return fShowError("Missing parameter " + asParameterNames[uParameterIndex] + ", value #" + (uParameterRepeat + 1));
     }
     uParameterIndex++;
