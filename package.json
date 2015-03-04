@@ -1,6 +1,6 @@
 {
   "name": "foparsearguments",
-  "description": "Parse Node.js arguments library",
+  "description": "Function to parse command line arguments for Node.js programs",
   "keywords": [
     "argv",
     "process.argv",
