@@ -10,7 +10,7 @@ Getting Started
   `npm install foparsearguments`
   
   Optionally: rename `foparsearguments` to `foParseArguments`: npm is unable to
-  handle the complexity of uppercase characters in a module name. Node on
+  handle the complexity of uppercase characters in a module name. Node.js on
   Windows does not have this problem, so renaming the folder is not required
   for you to use the module.
   

@@ -150,9 +150,9 @@ function foParseArguments(oSettings, asArguments) {
       return nValue;
     },
   };
-  if ("dfxTypesConverters" in oSettings) {
-    for (sTypeName in oSettings.dfxTypesConverters) {
-      dfxTypeConverters[sTypeName] = oSettings.dfxTypesConverters[sTypeName];
+  if (oSettings.dfxTypeConverters) {
+    for (sTypeName in oSettings.dfxTypeConverters) {
+      dfxTypeConverters[sTypeName] = oSettings.dfxTypeConverters[sTypeName];
     }
   }
   var dsOptionTypeDescriptions = {},
