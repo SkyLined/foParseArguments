@@ -149,6 +149,11 @@ function foParseArguments(oSettings, asArguments) {
       if (isNaN(nValue) || nValue < 0) throw new Error("must be a positive number");
       return nValue;
     },
+    "float01": function (sValue) {
+      var nValue = parseFloat(sValue);
+      if (isNaN(nValue) || nValue < 0 || nValue > 1) throw new Error("must be a number between 0 and 1");
+      return nValue;
+    },
   };
   if (oSettings.dfxTypeConverters) {
     for (sTypeName in oSettings.dfxTypeConverters) {
