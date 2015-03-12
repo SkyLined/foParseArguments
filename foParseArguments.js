@@ -46,7 +46,9 @@ function fShowHelp(oSettings) {
   }
   if (oSettings.dxOptions) {
     console.log("Options:");
-    for (var sOptionName in oSettings.dxOptions) {
+    var asOptionNames = Object.keys(oSettings.dxOptions);
+    asOptionNames.sort();
+    asOptionNames.forEach(function (sOptionName) {
       var oOptionSettings = oSettings.dxOptions[sOptionName],
           sAdditionalName = oOptionSettings.sShortName ? " (or -" + oOptionSettings.sShortName + "=...)" : "";
       console.log("    --" + sOptionName + "=" + oOptionSettings.sTypeDescription + sAdditionalName);
@@ -54,14 +56,16 @@ function fShowHelp(oSettings) {
       if (oOptionSettings.xDefaultValue !== undefined) {
         console.log("        default: " + JSON.stringify(oOptionSettings.xDefaultValue));
       }
-    }
+    });
   }
   if (oSettings.dxSwitches) {
     console.log("Switches:");
-    for (var sSwitchName in oSettings.dxSwitches) {
+    var asSwitchNames = Object.keys(oSettings.dxSwitches);
+    asSwitchNames.sort();
+    asSwitchNames.forEach(function (sSwitchName) {
       console.log("    --" + sSwitchName);
       console.log("        " + oSettings.dxSwitches[sSwitchName].sHelpText);
-    }
+    });
   }
 }
 function fShowError(sMessage) {
