@@ -187,6 +187,28 @@ function foParseArguments(oSettings, asArguments) {
       dbSwitches[sSwitchName] = false;
     }
   }
+  
+  function fsGetExcludedSwitchOrOption(oSwitchOrOptionSettings) {
+    if (oSwitchOrOptionSettings.asExcludesSwitches) {
+      var sInvalidSwitch;
+      if (oSwitchOrOptionSettings.asExcludesSwitches.some(function (sExcludedSwitch) {
+        sInvalidSwitch = sExcludedSwitch;
+        return dbSwitches[sExcludedSwitch];
+      })) {
+        return sInvalidSwitch;
+      }
+    }
+    if (oSwitchOrOptionSettings.asExcludesOptions) {
+      var sInvalidOption;
+      if (oSwitchOrOptionSettings.asExcludesOptions.some(function (sExcludedOption) {
+        sInvalidOption = sExcludedOption;
+        return sExcludedOption in dsOptionNames;
+      })) {
+        return sInvalidOption;
+      }
+    }
+  }
+  
   var asParameterNames = [],
       asParameterTypeDescriptions = [],
       aauParameterRepeats = [],
@@ -222,7 +244,11 @@ function foParseArguments(oSettings, asArguments) {
           sValue = oOptionOrSwitchMatch[3];;
       if (sName in dxSwitchNames) {
         if (sValue) {
-          return fShowError("Switch \"" + sName + "\" does not take a value");
+          return fShowError("Switch \"--" + sName + "\" does not take a value");
+        }
+        var sExcludedSwitchOrOption = fsGetExcludedSwitchOrOption(oSettings.dxSwitches[sName]);
+        if (sExcludedSwitchOrOption) {
+          return fShowError("Switch \"--" + sName + "\" cannot be used with \"--" + sExcludedSwitchOrOption + "\"");
         }
         dbSwitches[sName] = true;
       } else if (sName in dsOptionNames) {
@@ -231,7 +257,7 @@ function foParseArguments(oSettings, asArguments) {
           if (++u < process.argv.length) {
             sValue = process.argv[u];
           } else {
-            return fShowError("Missing value for \"" + sName + "\"");
+            return fShowError("Missing value for option \"--" + sName + "\"");
           }
         }
         var xOptionValue = fxParseValueUsingTypeDescription("option " + sOptionName, sValue, 
@@ -239,9 +265,13 @@ function foParseArguments(oSettings, asArguments) {
         if (xOptionValue === undefined) {
           return;
         }
+        var sExcludedSwitchOrOption = fsGetExcludedSwitchOrOption(oSettings.dxOptions[sName]);
+        if (sExcludedSwitchOrOption) {
+          return fShowError("Switch \"--" + sName + "\" cannot be used with \"--" + sExcludedSwitchOrOption + "\"");
+        }
         dxOptions[sOptionName] = xOptionValue;
       } else {
-        return fShowError("Unknown options \"" + sName + "\"");
+        return fShowError("Unknown options \"--" + sName + "\"");
       }
     } else if (uParameterIndex < asParameterNames.length) {
       var sParameterName = asParameterNames[uParameterIndex],
