@@ -1,4 +1,7 @@
+module.exports = foParseArguments;
+
 var oPath = require("path");
+
 function fShowHelp(oSettings) {
   asUsage = [oPath.basename(process.argv[1])];
   if (oSettings.adxParameters) {
@@ -324,5 +327,3 @@ function foParseArguments(oSettings, asArguments) {
     "dxOptions": dxOptions,
   }
 }
-
-module.exports = foParseArguments;
