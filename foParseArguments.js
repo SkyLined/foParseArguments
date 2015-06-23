@@ -244,7 +244,7 @@ function foParseArguments(oSettings, asArguments) {
         sArgument.match(/^\-(?:([^:=])|\-([^:=]{2,}))(?:[:=](.+))?$/)
     );
     if (oOptionOrSwitchMatch) {
-      if (sArgument == "-?" || sArgument == "--help") {
+      if (sArgument == "-?" || sArgument == "-h" || sArgument == "--help") {
         return fShowHelp(oSettings);
       }
       var sName = oOptionOrSwitchMatch[1] || oOptionOrSwitchMatch[2],
