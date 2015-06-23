@@ -241,7 +241,7 @@ function foParseArguments(oSettings, asArguments) {
     }
     var oOptionOrSwitchMatch = (
         bNoMoreOptionsOrSwitches ? false :
-        sArgument.match(/^\-(?:([^:=])|\-([^:=]+))(?:[:=](.+))?$/)
+        sArgument.match(/^\-(?:([^:=])|\-([^:=]{2,}))(?:[:=](.+))?$/)
     );
     if (oOptionOrSwitchMatch) {
       if (sArgument == "-?" || sArgument == "--help") {
@@ -278,7 +278,7 @@ function foParseArguments(oSettings, asArguments) {
         }
         dxOptions[sOptionName] = xOptionValue;
       } else {
-        return fShowError("Unknown options \"--" + sName + "\"");
+        return fShowError("Unknown options \"-" + (sName.length > 1 ? "-" : "") + sName + "\"");
       }
     } else if (uParameterIndex < asParameterNames.length) {
       var sParameterName = asParameterNames[uParameterIndex],
